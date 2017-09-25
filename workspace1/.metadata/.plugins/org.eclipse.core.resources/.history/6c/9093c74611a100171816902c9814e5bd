@@ -1,0 +1,27 @@
+package jdbcdemo;
+
+import java.io.FileInputStream;
+import java.sql.*;
+import java.util.Properties;
+
+public class Flughafen {
+
+	private Connection myConn;
+	
+	public Flughafen() throws Exception {
+		
+		Properties props = new Properties();
+		props.load(new FileInputStream("flightdata.properties"));
+		
+		String user = props.getProperty("user");
+		String password = props.getProperty("password");
+		String dburl = props.getProperty("dburl");	
+		
+		myConn = DriverManager.getConnection(dburl, user, password);
+		
+		System.out.println("DB conncetion successful to: " + dburl);
+		
+		
+	}
+	
+}
