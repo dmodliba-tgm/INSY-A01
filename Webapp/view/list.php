@@ -179,13 +179,20 @@
                                         ?>
                                     </div>
                                     </table>
+                                    <hr>
                                     <?php
+                                    //Print occupied seats
                                     echo $result -> rowCount();
                                     echo " / ";
-                                    $result = $conn -> query("SELECT maxseats FROM planes WHERE id = $flight[6]");
+                                    $result = $conn -> query("SELECT maxseats, manufacturer, type FROM planes WHERE id = $flight[6]");
                                     $row = $result -> fetch();
                                     echo $row[0];
-                                    echo " Plätzen belegt";
+                                    echo " Plätzen belegt<br>";
+
+                                    //print plane type
+                                    echo "Flugzeug: ";
+                                    echo $row[1] . " " . $row[2];
+                                    $result
                                     ?>
                                     <hr>
                                 </div>
