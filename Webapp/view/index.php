@@ -17,9 +17,10 @@
                     <h1>
                         Flugdaten
                     </h1>
+                    <hr>
                 </div>
                 <div class="col-12">
-                    <form action="list.php" method="get">
+                    <form action="list.php" method="post">
                         <input type="text" placeholder="Flugnummer" name="fnr">
 
                         <button type="submit">
