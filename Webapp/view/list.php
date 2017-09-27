@@ -3,6 +3,7 @@
         <meta charset="utf-8">
         <!-- Bootstrap CDN -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="../styles/styles.css">
 
         <!-- JQuery CDN -->
         <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
@@ -101,7 +102,7 @@
                                     <h2>
                                         Ankunft
                                     </h2>
-                                    <!-- Print of Start Country -->
+                                    <!-- Print of Destination Country -->
                                     <b>Land: </b> <?php
                                     $result = $conn -> query("SELECT country FROM airports WHERE airportcode LIKE '$dest_apc'");
                                     $row = $result -> fetch();
@@ -112,7 +113,7 @@
                                     echo $row[0];
                                     ?><br>
 
-                                    <!-- Print of Start City -->
+                                    <!-- Print of Destination City -->
                                     <b>Stadt: </b>
                                     <?php
                                     $result = $conn -> query("SELECT city FROM airports WHERE airportcode LIKE '$dest_apc'");
@@ -120,7 +121,7 @@
                                     echo $row[0];
                                     ?><br>
 
-                                    <!-- Print of Start Airport -->
+                                    <!-- Print of Destination Airport -->
                                     <b>Flughafen: </b>
                                     <?php
                                     $result = $conn -> query("SELECT name FROM airports WHERE airportcode LIKE '$dest_apc'");
@@ -128,7 +129,7 @@
                                     echo $row[0] . " (" . $dest_apc . ")";
                                     ?><br>
 
-                                    <!-- Print of Start Date -->
+                                    <!-- Print of Destination Date -->
                                     <b>Datum: </b>
                                     <?php
                                     $result = $conn -> query("SELECT EXTRACT(DAY FROM destination_time), EXTRACT(MONTH FROM destination_time), EXTRACT(YEAR FROM destination_time) FROM flights WHERE airline LIKE '$airlinecode' AND flightnr = $flightnumber");
@@ -137,7 +138,7 @@
                                     ?>
                                     <br>
 
-                                    <!-- Print of Start Time -->
+                                    <!-- Print of Destination Time -->
                                     <b>Uhrzeit: </b>
                                     <?php
                                     $result = $conn -> query("SELECT EXTRACT(HOUR FROM destination_time), EXTRACT(MINUTE FROM destination_time), EXTRACT(SECOND FROM destination_time) from flights WHERE airline LIKE '$airlinecode' AND flightnr = $flightnumber");
@@ -145,6 +146,47 @@
                                     echo str_pad($row[0], 2, "0", STR_PAD_LEFT) . ":" . str_pad($row[1], 2, "0", STR_PAD_LEFT) . ":" . str_pad($row[2], 2, "0", STR_PAD_LEFT);
                                     ?>
 
+                                    <hr>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <h2 class="text-left">
+                                        Passagierliste
+                                    </h2>
+                                    <table>
+                                        <tr>
+                                            <th>
+                                                Vorname
+                                            </th>
+                                            <th>
+                                                Nachname
+                                            </th>
+                                            <th colspan=2>
+                                                Sitznummer
+                                            </th>
+                                        </tr>
+                                        <?php
+                                        $result = $conn -> query("SELECT firstname, lastname, rownr, seatposition FROM passengers WHERE airline LIKE '$airlinecode' AND flightnr = $flightnumber ORDER BY 3 ASC, 4 ASC");
+                                        while($row = $result -> fetch()){
+                                            echo "<tr>";
+                                            echo "<td width='33%'>" . $row[0] . "</td>";
+                                            echo "<td width='33%'>" . $row[1] . "</td>";
+                                            echo "<td width='33%'>" . $row[2] . $row[3] . "</td>";
+                                            echo "<td width='33%'>Kick</td>";
+                                            echo "</tr>";
+                                        }
+                                        ?>
+                                    </div>
+                                    </table>
+                                    <?php
+                                    echo $result -> rowCount();
+                                    echo " / ";
+                                    $result = $conn -> query("SELECT maxseats FROM planes WHERE id = $flight[6]");
+                                    $row = $result -> fetch();
+                                    echo $row[0];
+                                    echo " Plätzen belegt";
+                                    ?>
                                     <hr>
                                 </div>
                             </div>
@@ -166,7 +208,7 @@
                         }
                         ?>
                     <a href="index.php">
-                        Zurück
+                        &lt; Zurück
                     </a>
                 </div>
             </div>

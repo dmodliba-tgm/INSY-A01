@@ -15,7 +15,7 @@
             <div class="row text-center">
                 <div class="col-12">
                     <h1>
-                        Flugdaten
+                        Flugnummer
                     </h1>
                     <hr>
                 </div>
