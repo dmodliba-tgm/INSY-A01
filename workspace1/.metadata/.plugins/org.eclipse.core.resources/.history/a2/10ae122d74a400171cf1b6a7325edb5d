@@ -1,0 +1,83 @@
+package jdbcdemo;
+
+import javax.swing.*;
+import java.sql.*;
+import java.awt.Font;
+
+public class FlughaefenSearchApp extends JFrame{
+	
+	
+    JComboBox abflug = new JComboBox();
+    JPanel panel = new JPanel();
+    Connection con;
+    Statement st;
+    ResultSet rs;
+    
+    
+    public FlughaefenSearchApp() {
+    	
+    JLabel lblAbflug = new JLabel("Abflug--->");
+    lblAbflug.setHorizontalAlignment(SwingConstants.CENTER);
+    lblAbflug.setFont(new Font("Tahoma", Font.PLAIN, 52));
+    panel.add(lblAbflug);
+    this.getContentPane().add(panel);
+    
+    panel.add(abflug);
+    
+    JComboBox zielflug = new JComboBox();
+    panel.add(zielflug);
+    
+    JLabel lblZielflug = new JLabel("<---Zielflug");
+    lblZielflug.setFont(new Font("Tahoma", Font.PLAIN, 52));
+    panel.add(lblZielflug);
+    
+    JButton btnSearch = new JButton("Search");
+    panel.add(btnSearch);
+    this.setVisible(true);
+    	
+    this.setSize(874, 666);
+    this.setLocationRelativeTo(null);
+    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    
+    try{
+    	
+      con = DriverManager.getConnection("jdbc:mysql://localhost:3306/flightdata", "root", "Butz");
+      st = con.createStatement();
+      
+      String s = "select * from airports";
+      rs = st.executeQuery(s);
+      
+        while(rs.next())
+        {
+        	abflug.addItem(rs.getString(2));
+        	zielflug.addItem(rs.getString(2));
+        }
+        
+    }catch(Exception e){
+    	
+        JOptionPane.showMessageDialog(null, "ERROR");
+        
+    }finally{
+    	
+        try{
+        	
+            st.close();
+            rs.close();
+            con.close();
+            
+        }catch(Exception e){
+        	
+            JOptionPane.showMessageDialog(null, "ERROR CLOSE");
+        }
+        
+    }
+    
+   
+    
+    }
+
+public static void main(String[] args){
+            new FlughaefenSearchApp();
+  }
+
+}

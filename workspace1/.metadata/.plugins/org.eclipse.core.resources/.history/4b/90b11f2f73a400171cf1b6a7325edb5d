@@ -1,0 +1,80 @@
+package jdbcdemo;
+
+import javax.swing.*;
+import java.sql.*;
+
+public class FlughaefenSearchApp extends JFrame{
+	
+	
+    JComboBox abflug = new JComboBox();
+    JPanel panel = new JPanel();
+    Connection con;
+    Statement st;
+    ResultSet rs;
+    
+    
+    public FlughaefenSearchApp() {
+    	
+    JLabel lblAbflug = new JLabel("Abflug");
+    panel.add(lblAbflug);
+    	    
+    panel.add(abflug);
+    this.getContentPane().add(panel);
+    	    
+    JLabel lblZielflug = new JLabel("Zielflug");
+    lblZielflug.setVerticalAlignment(SwingConstants.BOTTOM);
+    panel.add(lblZielflug);
+    	    
+    JComboBox zielflug = new JComboBox();
+    panel.add(zielflug);
+    
+    JButton btnSearch = new JButton("Search");
+    panel.add(btnSearch);
+    this.setVisible(true);
+    	
+    this.setSize(433, 666);
+    this.setLocationRelativeTo(null);
+    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    
+    try{
+    	
+      con = DriverManager.getConnection("jdbc:mysql://localhost:3306/flightdata", "root", "Butz");
+      st = con.createStatement();
+      
+      String s = "select * from airports";
+      rs = st.executeQuery(s);
+      
+        while(rs.next())
+        {
+        	abflug.addItem(rs.getString(2));
+        	zielflug.addItem(rs.getString(2));
+        }
+        
+    }catch(Exception e){
+    	
+        JOptionPane.showMessageDialog(null, "ERROR");
+        
+    }finally{
+    	
+        try{
+        	
+            st.close();
+            rs.close();
+            con.close();
+            
+        }catch(Exception e){
+        	
+            JOptionPane.showMessageDialog(null, "ERROR CLOSE");
+        }
+        
+    }
+    
+   
+    
+    }
+
+public static void main(String[] args){
+            new FlughaefenSearchApp();
+  }
+
+}
