@@ -33,7 +33,9 @@
                             $conn = new PDO("mysql:host=$hostname;dbname=$dbname", $username, $password);
                             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                            $stmt = $conn -> prepare("SELECT * FROM flights WHERE airline LIKE :airlinecode AND flightnr = :flightnumber");
+                            //SELECT * FROM flights WHERE airline LIKE :airline AND flightnr=:flightnr
+
+                            $stmt = $conn -> prepare("SELECT * FROM flights WHERE airline LIKE :airlinecode AND flightnr=:flightnumber");
                             $stmt -> bindParam(":airlinecode", $airlinecode);
                             $stmt -> bindParam(":flightnumber", $flightnumber);
 
@@ -156,7 +158,7 @@
                                     <h2 class="text-left">
                                         Passagierliste
                                     </h2>
-                                    <table>
+                                    <table class="table table-striped">
                                         <tr>
                                             <th>
                                                 Vorname
@@ -164,7 +166,7 @@
                                             <th>
                                                 Nachname
                                             </th>
-                                            <th colspan=2>
+                                            <th colspan="2">
                                                 Sitznummer
                                             </th>
                                         </tr>
@@ -172,19 +174,19 @@
                                         $result = $conn -> query("SELECT firstname, lastname, rownr, seatposition, id FROM passengers WHERE airline LIKE '$airlinecode' AND flightnr = $flightnumber ORDER BY 3 ASC, 4 ASC");
                                         while($row = $result -> fetch()){
                                             echo "<tr>";
+                                            echo "<td>" . $row[0] . "</td>";
+                                            echo "<td>" . $row[1] . "</td>";
+                                            echo "<td>" . $row[2] . $row[3] . "</td>";
                                             echo "<form action='kick.php' method='post'>";
+                                            echo "<td>";
                                             echo "<input type='text' style='visibility:hidden;' value=$row[4] name='passenger_id'>";
-                                            echo "<td width='33%'>" . $row[0] . "</td>";
-                                            echo "<td width='33%'>" . $row[1] . "</td>";
-                                            echo "<td width='33%'>" . $row[2] . $row[3] . "</td>";
-                                            echo "<td width='33%'><button type='submit'>Kick</button></td>";
+                                            echo "<button class='btn btn-danger' type='submit'>Kick</button></td>";
                                             echo "</form>";
                                             echo "</tr>";
                                         }
                                         ?>
                                     </div>
                                     </table>
-                                    <hr>
                                     <?php
                                     //Print occupied seats
                                     echo $result -> rowCount();
