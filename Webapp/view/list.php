@@ -23,10 +23,12 @@
                 </div>
                 <div class="col-12">
                     <?php
+
                         $hostname = 'localhost';
                         $dbname = 'flightdata';
                         $username = 'dmodliba';
                         $password = '1234';
+
                         try {
                             $conn = new PDO("mysql:host=$hostname;dbname=$dbname", $username, $password);
                             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -35,7 +37,7 @@
                             $stmt -> bindParam(":airlinecode", $airlinecode);
                             $stmt -> bindParam(":flightnumber", $flightnumber);
 
-                            $input = $_POST['fnr'];
+                            $input = $_GET['fnr'];
                             $airlinecode = substr($input, 0, 2);
                             $flightnumber = substr($input, 2, 5);
 
@@ -167,13 +169,16 @@
                                             </th>
                                         </tr>
                                         <?php
-                                        $result = $conn -> query("SELECT firstname, lastname, rownr, seatposition FROM passengers WHERE airline LIKE '$airlinecode' AND flightnr = $flightnumber ORDER BY 3 ASC, 4 ASC");
+                                        $result = $conn -> query("SELECT firstname, lastname, rownr, seatposition, id FROM passengers WHERE airline LIKE '$airlinecode' AND flightnr = $flightnumber ORDER BY 3 ASC, 4 ASC");
                                         while($row = $result -> fetch()){
                                             echo "<tr>";
+                                            echo "<form action='kick.php' method='post'>";
+                                            echo "<input type='text' style='visibility:hidden;' value=$row[4] name='passenger_id'>";
                                             echo "<td width='33%'>" . $row[0] . "</td>";
                                             echo "<td width='33%'>" . $row[1] . "</td>";
                                             echo "<td width='33%'>" . $row[2] . $row[3] . "</td>";
-                                            echo "<td width='33%'>Kick</td>";
+                                            echo "<td width='33%'><button type='submit'>Kick</button></td>";
+                                            echo "</form>";
                                             echo "</tr>";
                                         }
                                         ?>

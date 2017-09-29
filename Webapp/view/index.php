@@ -20,7 +20,7 @@
                     <hr>
                 </div>
                 <div class="col-12">
-                    <form action="list.php" method="post">
+                    <form action="list.php" method="get">
                         <input type="text" placeholder="Flugnummer" name="fnr">
 
                         <button type="submit">
