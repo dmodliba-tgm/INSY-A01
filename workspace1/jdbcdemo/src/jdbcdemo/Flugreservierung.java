@@ -2,16 +2,20 @@ package jdbcdemo;
 
 import javax.swing.*;
 import java.sql.*;
+import java.util.ArrayList;
 import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class Flugreservierung extends JFrame{
 	
-	
-    JComboBox abflug = new JComboBox();
-    JComboBox zielflug = new JComboBox();
+    static JComboBox abflug = new JComboBox();
+    static JComboBox zielflug = new JComboBox();
     JComboBox flug = new JComboBox();
+    
+    
+    
+    
     
     JPanel panel = new JPanel();
     
@@ -22,6 +26,14 @@ public class Flugreservierung extends JFrame{
     
     Statement s2;
     ResultSet rs2;
+    
+    
+    
+    
+    
+    
+    
+    
     
     public Flugreservierung() {
     	
@@ -40,15 +52,24 @@ public class Flugreservierung extends JFrame{
     
     panel.add(abflug);
     panel.add(zielflug);
-    panel.add(flug);
     
     JLabel lblZielflug = new JLabel("<---Zielflug");
     lblZielflug.setFont(new Font("Tahoma", Font.PLAIN, 20));
     panel.add(lblZielflug);
+    panel.add(flug);
     
     JButton btnSearch = new JButton("Search"); 
     btnSearch.setFont(new Font("Tahoma", Font.PLAIN, 20));
     panel.add(btnSearch);
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     try{
 		
@@ -58,12 +79,14 @@ public class Flugreservierung extends JFrame{
 		String s = "select * from airports";
 		rs = st.executeQuery(s);
       
+		
 		while(rs.next())
         {
         	abflug.addItem(rs.getString(2));
         	zielflug.addItem(rs.getString(2));
         }
         
+		
     }catch(Exception e){
     	
         JOptionPane.showMessageDialog(null, "ERROR");
@@ -79,28 +102,58 @@ public class Flugreservierung extends JFrame{
         
     }
 
+    
     btnSearch.addActionListener(new ActionListener() {	
     	
     public void actionPerformed(ActionEvent e) {
     		try {
     			
+    			ArrayList<String> vorhandeneFluege = new ArrayList<String>();
+    			
+    			
 				s2 = con.createStatement();
-				rs2 = s2.executeQuery("select * from flights,(select airportcode as 'depcode' from airports "
-										+ "WHERE name='"+abflug.getSelectedItem()+"')dep,(select airportcode as 'arrcode' from airports WHERE name='"+zielflug.getSelectedItem()+"')arr "
-										+ "WHERE depcode = departure_airport AND arrcode = destination_airport;");
+				
+				
+				rs2 = s2.executeQuery("select * from flights,"
+										+ "(select airportcode as 'departure_airport_code' from airports "
+											+ "WHERE name='"+abflug.getSelectedItem()+"')depature,"
+												+ "(select airportcode as 'destination_airport_code' from airports WHERE name='"+zielflug.getSelectedItem()+"')destination "
+													+ "WHERE departure_airport_code = departure_airport AND destination_airport_code = destination_airport;");
+				
+				
 				
 				while(rs2.next()) {
-					flug.addItem("Airline: " + rs2.getString(1) + " --- Flightnr: " + rs2.getInt(2) + " --- Depature time: " + rs2.getDate(3) + " " + rs2.getTime(3) + " --- Depature Airport: " + rs2.getString(4) + " --- Destination Time: " + rs2.getDate(5) + " " + rs2.getTime(5) + " --- Destination Ariport: " + rs2.getString(6) + " --- Planettype: " + rs2.getInt(7));
+					vorhandeneFluege.add("Airline: " + rs2.getString(1) + " --- Flightnr: " + rs2.getInt(2) + " --- Depature time: " + rs2.getDate(3) + " " + rs2.getTime(3) + " --- Depature Airport: " + rs2.getString(4) + " --- Destination Time: " + rs2.getDate(5) + " " + rs2.getTime(5) + " --- Destination Ariport: " + rs2.getString(6) + " --- Planettype: " + rs2.getInt(7));
 				}
 				
-				 	s2.close();
-		            rs2.close();
-		            con.close();
-		            
+				
+				
+				String[] vorhandeneFluegeImArray = vorhandeneFluege.toArray(new String[vorhandeneFluege.size()]);
+				
+				for (String alleFluege:vorhandeneFluegeImArray) {
+					flug.addItem(alleFluege);
+				}
+				
+				
+					if(vorhandeneFluegeImArray.length == 0) {
+						
+						setTitle("NO DATA, TRY AGAIN");
+						
+					}else {
+						
+						setTitle("Flugreservierung");
+						AddGuests guest = new AddGuests();
+						guest.setVisible(true);
+						
+					}
+
+				
     		} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
+    		
+    		
     	  		
     	}
     });

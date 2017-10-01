@@ -1,0 +1,139 @@
+package jdbcdemo;
+
+import java.util.*;
+import java.sql.*;
+import java.io.*;
+
+
+public class GuestsDAO {
+
+	private Connection myConn;
+	
+	public GuestsDAO() throws Exception {
+		
+		myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/flightdata", "root", "Butz");
+		
+	}
+	
+	public void addGuests(Guests theGuests) throws Exception {
+		PreparedStatement myStmt = null;
+
+		try {
+			
+			// prepare statement
+			myStmt = myConn.prepareStatement("insert into passengers"
+					+ " (firstname, lastname, airline, flightnr, rownr, seatposition)"
+					+ " values (?, ?, ?, ?, ?, ?)");
+			
+			// set params
+			myStmt.setString(1, theGuests.getFirstname());
+			myStmt.setString(2, theGuests.getLastname());
+			myStmt.setString(3, theGuests.getAirline());
+			myStmt.setInt(4, theGuests.getFlightnr());
+			myStmt.setInt(5, theGuests.getRownr());
+			myStmt.setString(6, theGuests.getSeatposition());
+			
+			// execute SQL
+			myStmt.executeUpdate();			
+		}
+		finally {
+			close(myStmt);
+		}
+		
+	}
+	
+	
+	public List<Guests> getAllGuestss() throws Exception {
+		List<Guests> list = new ArrayList<>();
+		
+		Statement myStmt = null;
+		ResultSet myRs = null;
+		
+		try {
+			myStmt = myConn.createStatement();
+			myRs = myStmt.executeQuery("select * from employees order by last_name");
+			
+			while (myRs.next()) {
+				Guests tempGuests = convertRowToGuests(myRs);
+				list.add(tempGuests);
+			}
+
+			return list;		
+		}
+		finally {
+			close(myStmt, myRs);
+		}
+	}
+	
+	public List<Guests> searchGuestss(String lastName) throws Exception {
+		List<Guests> list = new ArrayList<>();
+
+		PreparedStatement myStmt = null;
+		ResultSet myRs = null;
+
+		try {
+			lastName += "%";
+			myStmt = myConn.prepareStatement("select * from employees where last_name like ?  order by last_name");
+			
+			myStmt.setString(1, lastName);
+			
+			myRs = myStmt.executeQuery();
+			
+			while (myRs.next()) {
+				Guests tempGuests = convertRowToGuests(myRs);
+				list.add(tempGuests);
+			}
+			
+			return list;
+		}
+		finally {
+			close(myStmt, myRs);
+		}
+	}
+	
+	private Guests convertRowToGuests(ResultSet myRs) throws SQLException {
+		
+		int id = myRs.getInt("id");
+		String lastName = myRs.getString("last_name");
+		String firstName = myRs.getString("first_name");
+		String email = myRs.getString("email");
+		BigDecimal salary = myRs.getBigDecimal("salary");
+		
+		Guests tempGuests = new Guests(id, lastName, firstName, email, salary);
+		
+		return tempGuests;
+	}
+
+	
+	private static void close(Connection myConn, Statement myStmt, ResultSet myRs)
+			throws SQLException {
+
+		if (myRs != null) {
+			myRs.close();
+		}
+
+		if (myStmt != null) {
+			
+		}
+		
+		if (myConn != null) {
+			myConn.close();
+		}
+	}
+
+	private void close(Statement myStmt, ResultSet myRs) throws SQLException {
+		close(null, myStmt, myRs);		
+	}
+
+	private void close(Statement myStmt) throws SQLException {
+		close(null, myStmt, null);		
+	}
+	
+	public static void main(String[] args) throws Exception {
+		
+		GuestsDAO dao = new GuestsDAO();
+		System.out.println(dao.searchGuestss("thom"));
+
+		System.out.println(dao.getAllGuestss());
+	}
+}

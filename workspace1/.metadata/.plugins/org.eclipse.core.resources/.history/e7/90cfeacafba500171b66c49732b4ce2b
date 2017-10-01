@@ -1,0 +1,157 @@
+package jdbcdemo;
+
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.RowSpec;
+import com.jgoodies.forms.layout.FormSpecs;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+public class AddGuests extends JDialog {
+
+	private final JPanel contentPanel = new JPanel();
+	private JTextField IdTextField;
+	private JTextField FirstnameTextField;
+	private JTextField LastnameTextField;
+	private JTextField AirlineTextField;
+	private JTextField FlightnrTextField;
+	private JTextField RownrTextField;
+	private JTextField SeatpositionTextField;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		try {
+			AddGuests dialog = new AddGuests();
+			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.setVisible(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Create the dialog.
+	 */
+	public AddGuests() {
+		setBounds(100, 100, 450, 300);
+		getContentPane().setLayout(new BorderLayout());
+		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		contentPanel.setLayout(new FormLayout(new ColumnSpec[] {
+				FormSpecs.RELATED_GAP_COLSPEC,
+				FormSpecs.DEFAULT_COLSPEC,
+				FormSpecs.RELATED_GAP_COLSPEC,
+				ColumnSpec.decode("default:grow"),},
+			new RowSpec[] {
+				FormSpecs.RELATED_GAP_ROWSPEC,
+				FormSpecs.DEFAULT_ROWSPEC,
+				FormSpecs.RELATED_GAP_ROWSPEC,
+				FormSpecs.DEFAULT_ROWSPEC,
+				FormSpecs.RELATED_GAP_ROWSPEC,
+				FormSpecs.DEFAULT_ROWSPEC,
+				FormSpecs.RELATED_GAP_ROWSPEC,
+				FormSpecs.DEFAULT_ROWSPEC,
+				FormSpecs.RELATED_GAP_ROWSPEC,
+				FormSpecs.DEFAULT_ROWSPEC,
+				FormSpecs.RELATED_GAP_ROWSPEC,
+				FormSpecs.DEFAULT_ROWSPEC,
+				FormSpecs.RELATED_GAP_ROWSPEC,
+				FormSpecs.DEFAULT_ROWSPEC,}));
+		{
+			JLabel lblId = new JLabel("ID:");
+			contentPanel.add(lblId, "2, 2, right, default");
+		}
+		{
+			IdTextField = new JTextField();
+			contentPanel.add(IdTextField, "4, 2, fill, default");
+			IdTextField.setColumns(10);
+		}
+		{
+			JLabel lblFirstname = new JLabel("firstname:");
+			contentPanel.add(lblFirstname, "2, 4, right, default");
+		}
+		{
+			FirstnameTextField = new JTextField();
+			contentPanel.add(FirstnameTextField, "4, 4, fill, default");
+			FirstnameTextField.setColumns(10);
+		}
+		{
+			JLabel lblLastname = new JLabel("lastname:");
+			contentPanel.add(lblLastname, "2, 6, right, default");
+		}
+		{
+			LastnameTextField = new JTextField();
+			contentPanel.add(LastnameTextField, "4, 6, fill, default");
+			LastnameTextField.setColumns(10);
+		}
+		{
+			JLabel lblAirline = new JLabel("airline:");
+			contentPanel.add(lblAirline, "2, 8, right, default");
+		}
+		{
+			AirlineTextField = new JTextField();
+			contentPanel.add(AirlineTextField, "4, 8, fill, default");
+			AirlineTextField.setColumns(10);
+		}
+		{
+			JLabel lblFlightnr = new JLabel("flightnr:");
+			contentPanel.add(lblFlightnr, "2, 10, right, default");
+		}
+		{
+			FlightnrTextField = new JTextField();
+			contentPanel.add(FlightnrTextField, "4, 10, fill, default");
+			FlightnrTextField.setColumns(10);
+		}
+		{
+			JLabel lblRownr = new JLabel("rownr:");
+			contentPanel.add(lblRownr, "2, 12, right, default");
+		}
+		{
+			RownrTextField = new JTextField();
+			contentPanel.add(RownrTextField, "4, 12, fill, default");
+			RownrTextField.setColumns(10);
+		}
+		{
+			JLabel lblNewLabel = new JLabel("seatpositon:");
+			contentPanel.add(lblNewLabel, "2, 14, right, default");
+		}
+		{
+			SeatpositionTextField = new JTextField();
+			contentPanel.add(SeatpositionTextField, "4, 14, fill, default");
+			SeatpositionTextField.setColumns(10);
+		}
+		{
+			JPanel buttonPane = new JPanel();
+			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			{
+				
+				
+				JButton okButton = new JButton("OK");
+				
+				
+				okButton.setActionCommand("OK");
+				buttonPane.add(okButton);
+				getRootPane().setDefaultButton(okButton);
+			}
+			{
+				JButton cancelButton = new JButton("Cancel");
+				cancelButton.setActionCommand("Cancel");
+				buttonPane.add(cancelButton);
+			}
+		}
+	}
+	
+
+}
