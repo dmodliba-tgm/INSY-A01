@@ -1,0 +1,163 @@
+package jdbcdemo;
+
+import java.util.*;
+import java.sql.*;
+import java.io.*;
+
+/**
+ * Helper class for handling low-level JDBC calls to the database
+ *
+ */
+public class GuestDAO {
+
+	private Connection myConn;
+	
+	public GuestDAO() throws Exception {
+		
+		// connect to the database
+		
+		Properties props = new Properties();
+		props.load(new FileInputStream("flightdata.properties"));
+		
+		String user = props.getProperty("user");
+		String password = props.getProperty("password");
+		String dburl = props.getProperty("dburl");
+		
+		myConn = DriverManager.getConnection(dburl, user, password);
+		
+		System.out.println("DB connection successful to:" + dburl);
+		
+	}
+	
+	// Use the object theGuest for inserting information into the database
+	public void addGuest(Guest theGuest) throws Exception {
+		PreparedStatement myStmt = null;
+
+		try {
+			
+			//uses a placeholder and protects against SQL injection. Uses the column names firstname, lastname, etc
+			myStmt = myConn.prepareStatement("insert into passengers"
+					+ " (firstname, lastname, airline, flightnr, rownr, seatposition)"
+					+ " values (?, ?, ?, ?, ?, ?)");
+			
+			// value is set. 1 = first placeholder, 2 = second placeholder, etc.
+			myStmt.setString(1, theGuest.getFirstname());
+			myStmt.setString(2, theGuest.getLastname());
+			myStmt.setString(3, theGuest.getAirline());
+			myStmt.setInt(4, theGuest.getFlightnr());
+			myStmt.setInt(5, theGuest.getRownr());
+			myStmt.setString(6, theGuest.getSeatposition());
+			
+			// execute SQL
+			myStmt.executeUpdate();			
+		}
+		finally {
+			
+		}
+		
+	}
+	
+	/**
+	 * returns a list of all the guests, ordered by lastname
+	 * @throws Exception
+	 */
+	public List<Guest> getAllGuests() throws Exception {
+		
+		List<Guest> list = new ArrayList<>(); 						//empty list of guests
+		
+		Statement myStmt = null; 									//null = placeholder
+		ResultSet myRs = null; 										// null = placeholder
+		
+		try {
+			myStmt = myConn.createStatement(); 					   //creates an object for sending SQL statements to the database
+			
+			myRs = myStmt.executeQuery("select * from passengers order by lastname"); //executes the given SQL statement
+			
+			while (myRs.next()) { 								   // for each element in the ResultSet
+				Guest tempGuest = convertRowToGuest(myRs); 		   // Takes the result set and creates a guest object and returns it
+				list.add(tempGuest); 					 		   // After the guest is created it adds the guest to the list
+			}
+
+			return list; //returns the list after objects are added
+		}
+		finally {
+			close(myStmt, myRs); 									//closes the ResultSet and the Statement
+		}
+	}
+	
+	/**
+	 * search for guests by lastname
+	 * @param lastname
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Guest> searchGuests(String lastname) throws Exception {
+		
+		List<Guest> list = new ArrayList<>(); 						 //empty list of guests
+
+		PreparedStatement myStmt = null;							 //null = placeholder
+		ResultSet myRs = null;										 // null = placeholder
+
+		try {
+			
+			lastname += "%";										 //whatever lastname the user writes. appended with the "%", so it can use the like command
+			
+			myStmt = myConn.prepareStatement("select * from passengers where lastname like ? order by lastname"); //uses a placeholder and protects against SQL injection
+			
+			myStmt.setString(1, lastname); 							// value is set
+			
+			myRs = myStmt.executeQuery(); 							//execute the given SQL statement
+			
+			while (myRs.next()) { 									// for each element in the ResultSet
+				Guest tempGuest = convertRowToGuest(myRs);			//Takes the result set and creates a guest object and returns it
+				list.add(tempGuest);								//After the guest is created it adds the guest to the list
+			}
+			
+			return list;											 //returns the list after objects are added
+		}
+		finally {
+			close(myStmt, myRs);									//closes the ResultSet and the Statement
+		}
+	}
+	
+	private Guest convertRowToGuest(ResultSet myRs) throws SQLException {
+		
+		int id = myRs.getInt("id");
+		String firstname = myRs.getString("firstname");
+		String lastname = myRs.getString("lastname");
+		String airline = myRs.getString("airline");
+		int flightnr = myRs.getInt("flightnr");
+		int rownr = myRs.getInt("rownr");
+		String seatposition = myRs.getString("seatposition");
+		
+		Guest tempGuest = new Guest(id, firstname, lastname, airline, flightnr, rownr, seatposition);
+		
+		return tempGuest;
+	}
+
+	
+	private static void close(Connection myConn, Statement myStmt, ResultSet myRs)
+			throws SQLException {
+
+		if (myRs != null) {
+			myRs.close();
+		}
+
+		if (myStmt != null) {
+			
+		}
+		
+		if (myConn != null) {
+			myConn.close();
+		}
+	}
+
+	private void close(Statement myStmt, ResultSet myRs) throws SQLException {
+		close(null, myStmt, myRs);		
+	}
+
+	public static void main(String[] args) throws Exception {
+		
+		GuestDAO dao = new GuestDAO();
+	}
+}

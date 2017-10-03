@@ -1,0 +1,111 @@
+package jdbcdemo;
+
+import java.util.*;
+import java.sql.*;
+import java.io.*;
+
+public class GuestDAO {
+
+	private Connection myConn;
+	
+	public GuestDAO() throws Exception {
+		
+		// connect to database
+		myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/flightdata", "root", "Butz");
+		
+	}
+	
+	
+	
+	public List<Guest> getAllGuests() throws Exception {
+		List<Guest> list = new ArrayList<>();
+		
+		Statement myStmt = null;
+		ResultSet myRs = null;
+		
+		try {
+			myStmt = myConn.createStatement();
+			myRs = myStmt.executeQuery("select * from passengers");
+			
+			while (myRs.next()) {
+				Guest tempGuest = convertRowToGuest(myRs);
+				list.add(tempGuest);
+			}
+
+			return list;		
+		}
+		finally {
+			close(myStmt, myRs);
+		}
+	}
+	
+	public List<Guest> searchGuests(String lastname) throws Exception {
+		List<Guest> list = new ArrayList<>();
+
+		PreparedStatement myStmt = null;
+		ResultSet myRs = null;
+
+		try {
+			lastname += "%";
+			myStmt = myConn.prepareStatement("select * from passengers where lastname like ?");
+			
+			myStmt.setString(1, lastname);
+			
+			myRs = myStmt.executeQuery();
+			
+			while (myRs.next()) {
+				Guest tempGuest = convertRowToGuest(myRs);
+				list.add(tempGuest);
+			}
+			
+			return list;
+		}
+		finally {
+			close(myStmt, myRs);
+		}
+	}
+	
+	private Guest convertRowToGuest(ResultSet myRs) throws SQLException {
+		
+		int id = myRs.getInt("id");
+		String firstname = myRs.getString("firstname");
+		String lastname = myRs.getString("lastname");
+		String airline = myRs.getString("airline");
+		int flightnr = myRs.getInt("flightnr");
+		int rownr = myRs.getInt("rownr");
+		String seatposition = myRs.getString("seatposition");
+		
+		Guest tempGuest = new Guest(id, firstname, lastname, airline, flightnr, rownr, seatposition);
+		
+		return tempGuest;
+	}
+
+	
+	private static void close(Connection myConn, Statement myStmt, ResultSet myRs)
+			throws SQLException {
+
+		if (myRs != null) {
+			myRs.close();
+		}
+
+		if (myStmt != null) {
+			
+		}
+		
+		if (myConn != null) {
+			myConn.close();
+		}
+	}
+
+	private void close(Statement myStmt, ResultSet myRs) throws SQLException {
+		close(null, myStmt, myRs);		
+	}
+
+	public static void main(String[] args) throws Exception {
+		
+		GuestDAO dao = new GuestDAO();
+		System.out.println(dao.searchGuests("var"));
+
+		System.out.println(dao.getAllGuests());
+	}
+}

@@ -1,5 +1,9 @@
 package jdbcdemo;
 
+/**
+ * Basic Java class for guest. Getters and Setters for params of guest.
+ *
+ */
 public class Guest {
 
 	private int id;
@@ -9,6 +13,10 @@ public class Guest {
 	private int flightnr;
 	private int rownr;
 	private String seatposition;
+	
+	public Guest(String firstname, String lastname, String airline, int flightnr, int rownr, String seatposition) {
+		this(2001, firstname, lastname, airline, flightnr, rownr, seatposition); 
+	}
 	
 	public Guest(int id, String firstname, String lastname, String airline, int flightnr, int rownr,
 			String seatposition) {
