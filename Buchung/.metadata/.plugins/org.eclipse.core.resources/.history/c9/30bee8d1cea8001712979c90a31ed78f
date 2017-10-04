@@ -1,0 +1,189 @@
+package jdbcdemo;
+
+import javax.swing.*;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Properties;
+import java.awt.Font;
+import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.awt.event.ActionEvent;
+
+public class Flugreservierung extends JFrame{
+	
+    static JComboBox abflug = new JComboBox();
+    static JComboBox zielflug = new JComboBox();
+    JComboBox flug = new JComboBox();
+    
+    
+    
+    
+    
+    JPanel panel = new JPanel();
+    
+    Connection con;	// connector
+    
+    Statement st;	// sending SQL statements to the database
+    ResultSet rs;	// contains a table or a part of a table
+    
+    Statement s2;	// sending SQL statements to the database
+    ResultSet rs2;	// contains a table or a part of a table
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    public Flugreservierung() {
+    panel.setLayout(null);
+    	
+    JLabel lblAbflug = new JLabel("Abflug");
+    lblAbflug.setBounds(94, 6, 92, 25);
+    lblAbflug.setHorizontalAlignment(SwingConstants.CENTER);
+    lblAbflug.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    panel.add(lblAbflug);
+    
+    this.getContentPane().add(panel);
+    this.setVisible(true);
+    this.setSize(1042, 666);
+    this.setLocationRelativeTo(null);
+    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    abflug.setBounds(198, 10, 263, 22);
+    
+    
+    
+    panel.add(abflug);
+    zielflug.setBounds(647, 10, 263, 22);
+    panel.add(zielflug);
+    
+    JLabel lblZielflug = new JLabel("Zielflug");
+    lblZielflug.setBounds(553, 6, 101, 25);
+    lblZielflug.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    panel.add(lblZielflug);
+    flug.setBounds(0, 62, 1024, 22);
+    panel.add(flug);
+    
+    JButton btnSearch = new JButton("Search"); 
+    btnSearch.setBounds(423, 129, 182, 33);
+    btnSearch.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    panel.add(btnSearch);
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    try{
+		
+    	Properties props = new Properties();
+		props.load(new FileInputStream("flightdata.properties"));
+		
+		String user = props.getProperty("user");
+		String password = props.getProperty("password");
+		String dburl = props.getProperty("dburl");
+		
+		con = DriverManager.getConnection(dburl, user, password);
+		
+		st = con.createStatement();
+      
+		String s = "select * from airports";
+		rs = st.executeQuery(s);
+      
+		
+		while(rs.next())
+        {
+			// fills the JComboBox with airports and just returns the second column of the table
+        	abflug.addItem(rs.getString(2)); 
+        	zielflug.addItem(rs.getString(2));
+        }
+        
+		
+    }catch(Exception e){
+    	
+        JOptionPane.showMessageDialog(null, "ERROR");
+        
+    }finally{
+    	
+        try{
+
+        }catch(Exception e){
+        	
+            JOptionPane.showMessageDialog(null, "ERROR CLOSE");
+        }
+        
+    }
+
+    
+    btnSearch.addActionListener(new ActionListener() {	
+    	
+    public void actionPerformed(ActionEvent e) {
+    		try {
+    			
+    			// empty ArrayList (flights will be added)
+    			ArrayList<String> vorhandeneFluege = new ArrayList<String>();
+    			
+    			//creates an object for sending SQL statements to the database
+				s2 = con.createStatement();
+				
+				//executes the given SQL statement. Takes the object from the JComboBox and asks for the item, 
+				//so the query can check if there is any flight between the two airports
+				rs2 = s2.executeQuery("select * from flights,"
+										+ "(select airportcode as 'departure_airport_code' from airports "
+											+ "WHERE name='"+abflug.getSelectedItem()+"')depature,"
+												+ "(select airportcode as 'destination_airport_code' from airports WHERE name='"+zielflug.getSelectedItem()+"')destination "
+													+ "WHERE departure_airport_code = departure_airport AND destination_airport_code = destination_airport;");
+				
+				
+				// iterate throw the resultset and add the items in ArrayList vorhandeneFluege
+				while(rs2.next()) {
+					vorhandeneFluege.add("Airline: " + rs2.getString(1) + " --- Flightnr: " + rs2.getInt(2) + " --- Depature time: " + rs2.getDate(3) + " " + rs2.getTime(3) + " --- Depature Airport: " + rs2.getString(4) + " --- Destination Time: " + rs2.getDate(5) + " " + rs2.getTime(5) + " --- Destination Ariport: " + rs2.getString(6) + " --- Planettype: " + rs2.getInt(7));
+				}
+				
+				
+				// Puts the ArrayList in a Array. the array has the size of the arraylist
+				String[] vorhandeneFluegeImArray = vorhandeneFluege.toArray(new String[vorhandeneFluege.size()]);
+				
+				for (String alleFluege:vorhandeneFluegeImArray) {
+					flug.addItem(alleFluege);
+				}
+				
+				
+					//if there is no connection between the two airports
+					if(vorhandeneFluegeImArray.length == 0) {
+						
+						setTitle("NO DATA, TRY AGAIN");
+						
+					// if there is a connection it opens a new panel where the user can add himself in a flight
+					}else {
+						
+						setTitle("Flugreservierung");
+						GuestsSearchApp guest = new GuestsSearchApp();
+						guest.setVisible(true);
+						
+					}
+
+				
+    		} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+    		
+    		
+    	  		
+    	}
+    });
+    
+    }
+
+    public static void main(String[] args){
+            new Flugreservierung();
+    }
+
+}
