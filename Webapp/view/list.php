@@ -24,27 +24,30 @@
                 <div class="col-12">
                     <?php
 
-                        $hostname = 'localhost';
-                        $dbname = 'flightdata';
-                        $username = 'dmodliba';
-                        $password = '1234';
+                        include 'config.php'; //config file für db als php file mit variablen deklaration und definition
 
+                        //Ganzes DB Zeugs im try -> irgendwas läuft schieft -> entsprechender error wird ausgegeben (siehe catch)
                         try {
-                            $conn = new PDO("mysql:host=$hostname;dbname=$dbname", $username, $password);
+
+                            //stellt die verbindung zur db her
+                            $conn = new PDO("$dbtype:host=$hostname;dbname=$dbname", $username, $password);
                             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                            //SELECT * FROM flights WHERE airline LIKE :airline AND flightnr=:flightnr
-
+                            //prepared statement um vor bösartigen usereingaben geschützt zu sein
                             $stmt = $conn -> prepare("SELECT * FROM flights WHERE airline LIKE :airlinecode AND flightnr=:flightnumber");
                             $stmt -> bindParam(":airlinecode", $airlinecode);
                             $stmt -> bindParam(":flightnumber", $flightnumber);
 
+                            //teilt die usereingabe zb "aa000" auf in "aa" und "000" damit das format auf die datenbankstruktur passt
                             $input = $_GET['fnr'];
                             $airlinecode = substr($input, 0, 2);
                             $flightnumber = substr($input, 2, 5);
 
                             $stmt -> execute();
 
+                            //ab hier alles im if
+                            //grund: wenn die eingegebenen userdaten ein ergebnis produzieren kaönnen sie nicht fehlerhaft oder bösartig sein
+                            //deswegen ab hier keine prepared statements mehr notwendig
                             if($stmt -> rowCount() > 0){
                                 $flight = $stmt -> fetch();
                                 $start_apc = $flight[3];
@@ -52,6 +55,7 @@
                             ?>
 
                             <div class="row text-left">
+                                <!-- grafische aufbereitung der abfluginformationen -->
                                 <div class="col-lg-6">
                                     <h2>
                                         Abflug
@@ -102,6 +106,8 @@
 
                                     <hr>
                                 </div>
+
+                                <!-- grafische aufbereitung der ankunftsinformationen -->
                                 <div class="col-lg-6">
                                     <h2>
                                         Ankunft
@@ -153,6 +159,7 @@
                                     <hr>
                                 </div>
                             </div>
+                            <!-- passagierliste -->
                             <div class="row">
                                 <div class="col-lg-12">
                                     <h2 class="text-left">
@@ -179,6 +186,7 @@
                                             echo "<td>" . $row[2] . $row[3] . "</td>";
                                             echo "<form action='kick.php' method='post'>";
                                             echo "<td>";
+                                            //verstecktes input feld mit der passenger_id als value damit der wert mittels post an das kick script überegben werden kann
                                             echo "<input type='text' style='visibility:hidden;' value=$row[4] name='passenger_id'>";
                                             echo "<button class='btn btn-danger' type='submit'>Kick</button></td>";
                                             echo "</form>";
@@ -209,6 +217,7 @@
                                 ?>
                                 <div class="col-lg-12">
                                 <?php
+                                //Nutzer hat scheinbar fehlerhafte Daten eingegeben -> Diese nachricht wir angezeigt
                                 echo "Ihre Eingabe ist eventuell fehlerhaft.";
                                 ?>
                             </div>
@@ -218,6 +227,7 @@
 
                             $conn = null;
                         } catch(Exception $e){
+                            //Programm hat ein Problem -> Diese Fehlermeldung wird angezeigt
                             echo "Error: " . $e->getMessage();
                         }
                         ?>

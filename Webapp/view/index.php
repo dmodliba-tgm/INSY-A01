@@ -3,9 +3,9 @@
         <!-- Bootstrap CDN -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
-        <!-- JQuery CDN -->
+        <!-- JQuery CDN
         <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-
+        -->
         <title>
             Flugdaten
         </title>
@@ -20,6 +20,7 @@
                     <hr>
                 </div>
                 <div class="col-12">
+                    <!-- hier wird get verwendet damit nach dem kick script die vorherige flugnummer in der url übergeben werden kann -->
                     <form action="list.php" method="get">
                         <input type="text" placeholder="Flugnummer" name="fnr">
 
