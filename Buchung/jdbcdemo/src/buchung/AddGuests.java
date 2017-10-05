@@ -1,0 +1,189 @@
+package buchung;
+
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+public class AddGuests extends JFrame {
+
+	private JPanel contentPane;
+	private JTextField FirstnameTextField;
+	private JTextField LastnameTextField;
+	private JTextField AirlineTextField;
+	private JTextField FlightnrTextField;
+	private JTextField RownrTextField;
+	private JTextField SeatpositionTextField;
+	private JPanel panel_1;
+	private JButton btnOk;
+	private JButton btnCancel;
+
+
+	// The Guest DAO
+	private GuestDAO guestDAO;
+
+	//reference to GUIApp
+	private GuestsSearchApp guestsSearchApp;		
+
+	// Constructor when the guest is added
+	public AddGuests(GuestsSearchApp theGuestsSearchApp, GuestDAO theGuestDAO) {
+		this();
+		guestDAO = theGuestDAO;
+		guestsSearchApp = theGuestsSearchApp;
+	}
+
+
+	/**
+	 * Create the frame.
+	 */
+	public AddGuests() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 728, 436);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		
+		JPanel panel = new JPanel();
+		panel.setBounds(5, 5, 995, 32);
+		contentPane.add(panel);
+		
+		panel_1 = new JPanel();
+		panel_1.setBounds(5, 37, 10, 312);
+		contentPane.add(panel_1);
+		
+		{
+			JPanel buttonPane = new JPanel();
+			buttonPane.setBounds(5, 349, 995, 35);
+			getContentPane().add(buttonPane);
+			{
+				JButton okButton = new JButton("Save");
+				okButton.addActionListener(new ActionListener() {
+					
+					public void actionPerformed(ActionEvent e) {
+						saveGuest(); // calls the method saveGuest()
+					}
+				});
+				
+				okButton.setActionCommand("OK");
+				buttonPane.add(okButton);
+				getRootPane().setDefaultButton(okButton);
+			}
+			{
+				JButton cancelButton = new JButton("Cancel");
+				cancelButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						setVisible(false); // closes the window. set the visibility false;
+						dispose();
+					}
+				});
+				cancelButton.setActionCommand("Cancel");
+				buttonPane.add(cancelButton);
+			}
+		}
+		
+		RownrTextField = new JTextField();
+		RownrTextField.setBounds(165, 262, 116, 22);
+		contentPane.add(RownrTextField);
+		RownrTextField.setColumns(10);
+		
+		JLabel lblSeatposition = new JLabel("seatposition");
+		lblSeatposition.setBounds(72, 300, 68, 16);
+		contentPane.add(lblSeatposition);
+		
+		SeatpositionTextField = new JTextField();
+		SeatpositionTextField.setBounds(165, 297, 116, 22);
+		contentPane.add(SeatpositionTextField);
+		SeatpositionTextField.setColumns(10);
+		
+		JLabel lblRownr = new JLabel("rownr");
+		lblRownr.setBounds(90, 265, 34, 16);
+		contentPane.add(lblRownr);
+		
+		FlightnrTextField = new JTextField();
+		FlightnrTextField.setBounds(165, 218, 116, 22);
+		contentPane.add(FlightnrTextField);
+		FlightnrTextField.setColumns(10);
+		
+		JLabel lblFlightnr = new JLabel("flightnr");
+		lblFlightnr.setBounds(90, 221, 40, 16);
+		contentPane.add(lblFlightnr);
+		
+		AirlineTextField = new JTextField();
+		AirlineTextField.setBounds(165, 167, 116, 22);
+		contentPane.add(AirlineTextField);
+		AirlineTextField.setColumns(10);
+		
+		JLabel lblAirline = new JLabel("airline:");
+		lblAirline.setBounds(90, 170, 40, 16);
+		contentPane.add(lblAirline);
+		
+		LastnameTextField = new JTextField();
+		LastnameTextField.setBounds(165, 117, 116, 22);
+		contentPane.add(LastnameTextField);
+		LastnameTextField.setColumns(10);
+		
+		JLabel lblLastname = new JLabel("lastname:");
+		lblLastname.setBounds(83, 120, 57, 16);
+		contentPane.add(lblLastname);
+		
+		FirstnameTextField = new JTextField();
+		FirstnameTextField.setBounds(165, 68, 116, 22);
+		contentPane.add(FirstnameTextField);
+		FirstnameTextField.setColumns(10);
+		
+		JLabel lblFirstname = new JLabel("firstname:");
+		lblFirstname.setBounds(90, 71, 59, 16);
+		contentPane.add(lblFirstname);
+	}
+	
+	protected void saveGuest() {
+
+		// get the guest info from gui
+		String firstname = FirstnameTextField.getText();					// get firstname of textfield
+		String lastname = LastnameTextField.getText();						// get lastname of textfield	
+		String airline = AirlineTextField.getText();						// get airline of textfield
+		int flightnr = Integer.parseInt(FlightnrTextField.getText());		// get flightnr of textfield (int = String)
+		int rownr = Integer.parseInt(RownrTextField.getText());				// get rownr of textfield (int = String)
+		String seatposition = SeatpositionTextField.getText();				// get seatposition of textfield
+
+		//Object created to save it into the database
+		Guest tempGuest = new Guest(firstname, lastname, airline, flightnr, rownr, seatposition); 
+		
+		try {
+			// save to the database
+			guestDAO.addGuest(tempGuest);
+
+			// close dialog
+			setVisible(false);
+			dispose();
+
+			// refresh gui list
+			guestsSearchApp.refreshGuestsView();
+			
+			// show success message
+			JOptionPane.showMessageDialog(guestsSearchApp,
+					"Guest added succesfully.",
+					"Guest Added",
+					JOptionPane.INFORMATION_MESSAGE);
+		} catch (Exception exc) {
+			JOptionPane.showMessageDialog(
+					guestsSearchApp,
+					"Error saving guest: "
+							+ exc.getMessage(), "Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
+		
+	}
+
+}
+
+
